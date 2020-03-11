@@ -47,7 +47,7 @@ class CustomPlayer(DataPlayer):
         #          (the timer is automatically managed for you)
         import random
         
-        max_depth = 1
+        max_depth = 3
         # Opening book
         book = self.data
         
@@ -77,15 +77,7 @@ class CustomPlayer(DataPlayer):
             max_depth += 1
                    
 
-    def alpha_beta_search(self, gameState, depth):
-        """ Return the move along a branch of the game tree that
-        has the best possible value.  A move is a pair of coordinates
-        in (column, row) order corresponding to a legal move for
-        the searching player.
-        
-        You can ignore the special case of calling this function
-        from a terminal state.
-        """
+    def alpha_beta_search(self, gameState, depth):        
         alpha = float("-inf")
         beta = float("inf")
         best_score = float("-inf")
@@ -96,17 +88,17 @@ class CustomPlayer(DataPlayer):
             if value > best_score:                
                 best_score = value
                 best_move = action
-        # print('action ' , action , 'value ' , value , 'best score' , best_score, 'bsest move ' , best_move)    
+      
         return best_move
 
     
     def min_value(self, gameState, alpha, beta, depth):
-        """ Return the value for a win (+1) if the game is over,
-        otherwise return the minimum value over all legal child
-        nodes.
-        """
-        if gameState.terminal_test():
-            # print('termainal test' , gameState.utility(self.player_id))
+        """"  Returns min score or terminal state of :
+                            /  +infinity,   "player_id" wins
+        terminal state =  |   -infinity,   "player_id" loses
+                            \          0,    otherwise
+        """        
+        if gameState.terminal_test():            
             return gameState.utility(self.player_id)
         
         if depth <= 0:            
@@ -114,10 +106,8 @@ class CustomPlayer(DataPlayer):
             
         value = float("inf")
         for action in gameState.actions():            
-            # TODO: modify the call to max_value()
             value = min(value, self.max_value(gameState.result(action), alpha, beta, depth - 1))
             
-            # TODO: update the value bound
             if value <= alpha:
                 return value
             beta = min(beta, value)           
@@ -125,9 +115,10 @@ class CustomPlayer(DataPlayer):
 
     
     def max_value(self, gameState, alpha, beta, depth):
-        """ Return the value for a loss (-1) if the game is over,
-        otherwise return the maximum value over all legal child
-        nodes.
+        """"  Returns max score or terminal state of :
+                            /  +infinity,   "player_id" wins
+        terminal state =  |   -infinity,   "player_id" loses
+                            \          0,    otherwise
         """
         if gameState.terminal_test():
             return gameState.utility(self.player_id)
@@ -136,20 +127,17 @@ class CustomPlayer(DataPlayer):
             return self.score(gameState)
 
         value = float("-inf")
-        for action in gameState.actions():
-            # TODO: modify the call to min_value()
+        for action in gameState.actions():            
             value = max(value, self.min_value(gameState.result(action), alpha, beta, depth - 1))
-            # TODO: update the value bound
+            
             if value >= beta:
                 return value
             alpha = max(alpha, value)
         return value
 
     def score_base(self, state):
-        """Calculate the heuristic value of a game state from the point of view
-            of the given player. Similiar to custom_score_3:
-
-            1. only avoids center if player 1 has more moves than player 2
+        """ 
+            baseline heuristic for testing
         """
         own_loc = state.locs[self.player_id]       
         opp_loc = state.locs[1 - self.player_id]
@@ -160,9 +148,8 @@ class CustomPlayer(DataPlayer):
 
     def score(self, state):
         """Calculate the heuristic value of a game state from the point of view
-            of the given player. Similiar to custom_score_3:
-
-            1. only avoids center if player 1 has more moves than player 2
+            of the given player. 
+            Moves from defensive to offensive play at the midpoint of game.
         """
         AVG_PLY_GAME_LENGTH = 70
         own_loc = state.locs[self.player_id]       
