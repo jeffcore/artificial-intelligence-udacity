@@ -143,3 +143,9 @@ data.pickle
 
 adversarial_search-273493.zip
 adversarial_search-result-273493.json
+
+classical_planning-272690.zip
+classical_planning-result-272690.json
+
+sudoku_solver-271972.zip
+sudoku_solver-result-271972.json
